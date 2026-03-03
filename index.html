@@ -16,27 +16,10 @@ body {
     min-height: 100vh;
 }
 
-/* 🔥 Анімація вправо */
+/* 🔥 Анімація руху вправо */
 @keyframes bmwMoveRight {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
-}
-
-/* Кнопка історії */
-.history-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px 18px;
-    border-radius: 25px;
-    border: none;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
-    background-size: 300% 100%;
-    animation: bmwMoveRight 4s linear infinite;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
 .card {
@@ -51,34 +34,44 @@ body {
 h2 {
     text-align: center;
     margin-bottom: 20px;
-    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 6s linear infinite;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* 🔥 КНОПКИ акуратні */
+/* 🔥 ВСІ кнопки з анімацією */
 button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-top: 12px;
     border: none;
     border-radius: 10px;
-    font-weight: bold;
     color: white;
+    font-weight: bold;
     cursor: pointer;
     transition: transform 0.3s;
-    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
+
+    background: linear-gradient(
+        90deg,
+        #5BC2E7,
+        #1C69D4,
+        #E10600,
+        #5BC2E7
+    );
+
     background-size: 300% 100%;
     animation: bmwMoveRight 4s linear infinite;
 }
 
 button:hover {
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
-input[type="text"], select {
+input[type="text"], input[type="number"], select {
     width: 100%;
     padding: 8px;
     margin-top: 8px;
@@ -87,42 +80,97 @@ input[type="text"], select {
 }
 
 .service {
-    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
 }
 
-.hidden { display: none; }
+.service input[type="checkbox"] { display: none; }
+
+.custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #1C69D4;
+    border-radius: 6px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.service input[type="checkbox"]:checked + .custom-checkbox {
+    background: linear-gradient(45deg, #5BC2E7, #1C69D4, #E10600);
+    border: none;
+}
+
+.service input[type="checkbox"]:checked + .custom-checkbox::after {
+    content: "✔";
+    position: absolute;
+    top: -2px;
+    left: 4px;
+    color: white;
+    font-size: 16px;
+}
+
+.total {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background-size: 300% 100%;
+    animation: bmwMoveRight 6s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
 .modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
 }
 
-.history-box {
+.receipt {
     background: #111;
-    padding: 20px;
+    padding: 25px;
     border-radius: 15px;
-    width: 350px;
-    max-height: 80vh;
-    overflow-y: auto;
+    width: 340px;
+    box-shadow: 0 0 25px rgba(28,105,212,0.5);
     color: white;
 }
 
-.history-entry {
-    border-bottom: 1px solid #333;
-    padding: 8px 0;
-    font-size: 13px;
+.receipt h3 {
+    text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background-size: 300% 100%;
+    animation: bmwMoveRight 6s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
+
+.receipt-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.receipt-total {
+    border-top: 1px solid #333;
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: bold;
+    color: #5BC2E7;
+}
+
+.hidden { display: none; }
+
 </style>
 </head>
 
 <body>
-
-<button class="history-btn" onclick="openHistory()">Історія авто</button>
-
 <div class="card">
 
 <div id="page1">
@@ -133,133 +181,123 @@ input[type="text"], select {
 
 <h3 style="margin-top:15px;color:#aaa;">Додати новий автомобіль</h3>
 <input type="text" id="newCarNumber" placeholder="Номер авто">
-<input type="text" id="newCarVin" placeholder="VIN код (не обов'язково)">
+<input type="text" id="newCarVin" placeholder="VIN (не обов'язково)">
 <input type="text" id="newCarModel" placeholder="Модель авто">
-
-<button onclick="addCar()">Додати авто</button>
-<button onclick="goToPage2()">Далі → Вибір послуг</button>
+<button onclick="addCar()">Додати автомобіль</button>
+<button style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
 </div>
 
 <div id="page2" class="hidden">
 <h2>BMR ATELIER</h2>
 <div id="services"></div>
-<button onclick="saveService()">Зберегти послуги</button>
-<button onclick="goToPage1()">← Назад до авто</button>
+<button onclick="generateReceipt()">Згенерувати чек</button>
+<div class="total" id="total">Загальна сума: 0 грн</div>
+
+<h3 style="margin-top:20px;color:#ccc;">Додати власну послугу</h3>
+<input type="text" id="customName" placeholder="Назва послуги">
+<input type="number" id="customPrice" placeholder="Ціна">
+<button onclick="addService()">Додати послугу</button>
+<button style="margin-top:20px;" onclick="goToPage1()">← Назад до авто</button>
 </div>
 
-</div>
-
-<!-- Історія -->
-<div class="modal" id="historyModal">
-<div class="history-box">
-<h3>Історія обслуговування</h3>
-<div id="historyContent"></div>
-<button onclick="closeHistory()">Закрити</button>
-</div>
+<div class="modal" id="modal">
+    <div class="receipt">
+        <h3>BMR ATELIER</h3>
+        <div id="receiptCar"></div>
+        <div id="receiptItems"></div>
+        <div class="receipt-total" id="receiptTotal"></div>
+        <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
+        <button onclick="window.print()">Завантажити / Друк</button>
+        <button onclick="closeModal()">Закрити</button>
+    </div>
 </div>
 
 <script>
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 const carSelect = document.getElementById("carSelect");
 
-function saveData(){
-    localStorage.setItem("cars", JSON.stringify(cars));
-}
-
-function renderCars(){
-    carSelect.innerHTML="";
-    cars.forEach((car,i)=>{
-        if(!car.history) car.history=[];
-        carSelect.innerHTML+=`<option value="${i}">
-        ${car.number} - ${car.model} ${car.vin ? "- "+car.vin : ""}
-        </option>`;
+function renderCars() {
+    carSelect.innerHTML = "";
+    cars.forEach((car, i) => {
+        carSelect.innerHTML += `<option value="${i}">${car.number} ${car.model ? '- ' + car.model : ''} ${car.vin ? '- ' + car.vin : ''}</option>`;
     });
 }
 renderCars();
 
-function addCar(){
-    const number=newCarNumber.value.trim();
-    const vin=newCarVin.value.trim();
-    const model=newCarModel.value.trim();
-    if(!number||!model) return alert("Введіть номер і модель!");
-    cars.push({number,vin,model,history:[]});
-    saveData();
+function addCar() {
+    const number = document.getElementById("newCarNumber").value.trim();
+    const vin = document.getElementById("newCarVin").value.trim();
+    const model = document.getElementById("newCarModel").value.trim();
+    if (!number || !model) { alert("Введіть номер і модель авто!"); return; }
+    cars.push({ number, vin, model });
+    localStorage.setItem("cars", JSON.stringify(cars));
     renderCars();
-    newCarNumber.value="";
-    newCarVin.value="";
-    newCarModel.value="";
+    document.getElementById("newCarNumber").value = "";
+    document.getElementById("newCarVin").value = "";
+    document.getElementById("newCarModel").value = "";
 }
 
-function goToPage2(){
-    if(cars.length===0) return alert("Додайте авто!");
-    page1.classList.add("hidden");
-    page2.classList.remove("hidden");
+function goToPage2() {
+    if (cars.length === 0) { alert("Додайте автомобіль!"); return; }
+    document.getElementById("page1").classList.add("hidden");
+    document.getElementById("page2").classList.remove("hidden");
 }
 
-function goToPage1(){
-    page2.classList.add("hidden");
-    page1.classList.remove("hidden");
+function goToPage1() {
+    document.getElementById("page2").classList.add("hidden");
+    document.getElementById("page1").classList.remove("hidden");
 }
 
-let services={
-    "Заміна масла":800,
-    "Гальмівні колодки":1200,
-    "Діагностика":1500
+let services = {
+    "Заміна масла": 800,
+    "Заміна гальмівних колодок": 1200,
+    "Діагностика двигуна": 1500,
+    "Заміна фільтрів": 600,
+    "Розвал-сходження": 1000
 };
 
-function renderServices(){
-    const container=document.getElementById("services");
-    container.innerHTML="";
-    for(let s in services){
-        container.innerHTML+=`
-        <div class="service">
-        <label>
-        <input type="checkbox" value="${s}"> ${s}
-        </label>
-        </div>`;
+function renderServices() {
+    const container = document.getElementById("services");
+    container.innerHTML = "";
+    for (let service in services) {
+        container.innerHTML += `
+        <label class="service">
+            <input type="checkbox" value="${services[service]}" onchange="updateTotal()">
+            <span class="custom-checkbox"></span>
+            ${service} - ${services[service]} грн
+        </label>`;
     }
 }
 renderServices();
 
-function saveService(){
-    const car=cars[carSelect.value];
-    if(!car) return alert("Оберіть авто!");
-    let selected=[];
-    document.querySelectorAll("#services input:checked")
-    .forEach(el=>selected.push(el.value));
-    if(selected.length===0) return alert("Оберіть послуги!");
+function updateTotal() {
+    let total = 0;
+    document.querySelectorAll("input[type=checkbox]:checked")
+        .forEach(el => total += Number(el.value));
+    document.getElementById("total").innerText = "Загальна сума: " + total + " грн";
+}
 
-    car.history.push({
-        date:new Date().toLocaleString(),
-        services:selected
+function generateReceipt() {
+    const car = cars[carSelect.value];
+    let total = 0;
+    const itemsContainer = document.getElementById("receiptItems");
+    itemsContainer.innerHTML = "";
+    document.querySelectorAll("input[type=checkbox]:checked").forEach(el => {
+        const label = el.parentElement.innerText;
+        const price = Number(el.value);
+        total += price;
+        itemsContainer.innerHTML += `<div class="receipt-item"><span>${label}</span></div>`;
     });
-
-    saveData();
-    alert("Запис додано в історію!");
+    document.getElementById("receiptCar").innerHTML =
+        `<div class="receipt-item"><strong>Авто:</strong> ${car.number} - ${car.model} ${car.vin ? '- VIN: ' + car.vin : ''}</div>`;
+    document.getElementById("receiptTotal").innerText = "Разом: " + total + " грн";
+    document.getElementById("receiptDate").innerText = "Дата: " + new Date().toLocaleString();
+    document.getElementById("modal").style.display = "flex";
 }
 
-function openHistory(){
-    const car=cars[carSelect.value];
-    if(!car) return alert("Оберіть авто!");
-    historyContent.innerHTML="";
-    if(car.history.length===0){
-        historyContent.innerHTML="Історія пуста";
-    } else {
-        car.history.forEach(h=>{
-            historyContent.innerHTML+=`
-            <div class="history-entry">
-            <strong>${h.date}</strong><br>
-            ${h.services.join("<br>")}
-            </div>`;
-        });
-    }
-    historyModal.style.display="flex";
-}
-
-function closeHistory(){
-    historyModal.style.display="none";
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
 }
 </script>
-
 </body>
 </html>
