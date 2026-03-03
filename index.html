@@ -16,25 +16,10 @@ body {
     min-height: 100vh;
 }
 
-/* 🔥 Анімація BMW M */
-@keyframes bmwGradientFlow {
+/* 🔥 Анімація руху вправо */
+@keyframes bmwMoveRight {
     0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.bmw-gradient-text {
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    background-size: 300% 300%;
-    animation: bmwGradientFlow 6s ease infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.bmw-gradient-bg {
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    background-size: 300% 300%;
-    animation: bmwGradientFlow 6s ease infinite;
+    100% { background-position: 100% 50%; }
 }
 
 .card {
@@ -51,8 +36,14 @@ h2 {
     margin-bottom: 20px;
     font-weight: 800;
     letter-spacing: 2px;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background-size: 300% 100%;
+    animation: bmwMoveRight 6s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
+/* 🔥 ВСІ кнопки з анімацією */
 button {
     width: 100%;
     padding: 12px;
@@ -62,11 +53,22 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.3s;
+
+    background: linear-gradient(
+        90deg,
+        #5BC2E7,
+        #1C69D4,
+        #E10600,
+        #5BC2E7
+    );
+
+    background-size: 300% 100%;
+    animation: bmwMoveRight 4s linear infinite;
 }
 
-button:hover { 
-    transform: scale(1.05); 
+button:hover {
+    transform: scale(1.05);
 }
 
 input[type="text"], input[type="number"], select {
@@ -114,6 +116,11 @@ input[type="text"], input[type="number"], select {
     font-size: 18px;
     font-weight: bold;
     text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background-size: 300% 100%;
+    animation: bmwMoveRight 6s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .modal {
@@ -136,6 +143,11 @@ input[type="text"], input[type="number"], select {
 
 .receipt h3 {
     text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background-size: 300% 100%;
+    animation: bmwMoveRight 6s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .receipt-item {
@@ -153,7 +165,6 @@ input[type="text"], input[type="number"], select {
     color: #5BC2E7;
 }
 
-.close-btn { background: #222; margin-top:8px; }
 .hidden { display: none; }
 
 </style>
@@ -162,9 +173,8 @@ input[type="text"], input[type="number"], select {
 <body>
 <div class="card">
 
-<!-- Сторінка 1 -->
 <div id="page1">
-<h2 class="bmw-gradient-text">BMR ATELIER</h2>
+<h2>BMR ATELIER</h2>
 
 <label>Оберіть автомобіль:</label>
 <select id="carSelect"></select>
@@ -173,35 +183,32 @@ input[type="text"], input[type="number"], select {
 <input type="text" id="newCarNumber" placeholder="Номер авто">
 <input type="text" id="newCarVin" placeholder="VIN (не обов'язково)">
 <input type="text" id="newCarModel" placeholder="Модель авто">
-<button class="bmw-gradient-bg" onclick="addCar()">Додати автомобіль</button>
-
-<button class="bmw-gradient-bg" style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
+<button onclick="addCar()">Додати автомобіль</button>
+<button style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
 </div>
 
-<!-- Сторінка 2 -->
 <div id="page2" class="hidden">
-<h2 class="bmw-gradient-text">BMR ATELIER</h2>
+<h2>BMR ATELIER</h2>
 <div id="services"></div>
-<button class="bmw-gradient-bg" onclick="generateReceipt()">Згенерувати чек</button>
-<div class="total bmw-gradient-text" id="total">Загальна сума: 0 грн</div>
+<button onclick="generateReceipt()">Згенерувати чек</button>
+<div class="total" id="total">Загальна сума: 0 грн</div>
 
 <h3 style="margin-top:20px;color:#ccc;">Додати власну послугу</h3>
 <input type="text" id="customName" placeholder="Назва послуги">
 <input type="number" id="customPrice" placeholder="Ціна">
-<button class="bmw-gradient-bg" onclick="addService()">Додати послугу</button>
+<button onclick="addService()">Додати послугу</button>
 <button style="margin-top:20px;" onclick="goToPage1()">← Назад до авто</button>
 </div>
 
-<!-- Модальне вікно -->
 <div class="modal" id="modal">
     <div class="receipt">
-        <h3 class="bmw-gradient-text">BMR ATELIER</h3>
+        <h3>BMR ATELIER</h3>
         <div id="receiptCar"></div>
         <div id="receiptItems"></div>
         <div class="receipt-total" id="receiptTotal"></div>
         <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
-        <button class="bmw-gradient-bg" onclick="window.print()">Завантажити / Друк</button>
-        <button class="close-btn" onclick="closeModal()">Закрити</button>
+        <button onclick="window.print()">Завантажити / Друк</button>
+        <button onclick="closeModal()">Закрити</button>
     </div>
 </div>
 
@@ -235,6 +242,7 @@ function goToPage2() {
     document.getElementById("page1").classList.add("hidden");
     document.getElementById("page2").classList.remove("hidden");
 }
+
 function goToPage1() {
     document.getElementById("page2").classList.add("hidden");
     document.getElementById("page1").classList.remove("hidden");
@@ -287,19 +295,8 @@ function generateReceipt() {
     document.getElementById("modal").style.display = "flex";
 }
 
-function closeModal() { 
-    document.getElementById("modal").style.display = "none"; 
-}
-
-function addService() {
-    const name = document.getElementById("customName").value.trim();
-    const price = Number(document.getElementById("customPrice").value);
-    if (!name || !price) { alert("Введіть правильні дані!"); return; }
-    services[name] = price;
-    renderServices();
-    updateTotal();
-    document.getElementById("customName").value = "";
-    document.getElementById("customPrice").value = "";
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
 }
 </script>
 </body>
