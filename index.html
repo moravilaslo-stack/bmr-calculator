@@ -6,8 +6,6 @@
 <title>BMR ATELIER</title>
 
 <style>
-/* --- ТВОЄ ОФОРМЛЕННЯ НЕ ЗМІНЕНО --- */
-
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -129,6 +127,8 @@ input[type="text"], input[type="number"], select {
     width: 340px;
     box-shadow: 0 0 25px rgba(28,105,212,0.5);
     color: white;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .receipt-item {
@@ -188,7 +188,7 @@ input[type="text"], input[type="number"], select {
 
 </div>
 
-<!-- МОДАЛЬНЕ ВІКНО ЧЕКУ -->
+<!-- ЧЕК -->
 <div class="modal" id="receiptModal">
     <div class="receipt">
         <h3>BMR ATELIER</h3>
@@ -196,16 +196,17 @@ input[type="text"], input[type="number"], select {
         <div id="receiptItems"></div>
         <div class="receipt-total" id="receiptTotal"></div>
         <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
-        <button onclick="window.print()">Друк / Зберегти PDF</button>
+        <button onclick="window.print()">Друк / PDF</button>
         <button onclick="closeReceipt()">Закрити</button>
     </div>
 </div>
 
-<!-- МОДАЛЬНЕ ВІКНО ІСТОРІЇ -->
+<!-- ІСТОРІЯ -->
 <div class="modal" id="historyModal">
     <div class="receipt">
         <h3>Історія авто</h3>
-        <div id="historyContent"></div>
+        <select id="historyCarSelect" onchange="renderHistory()"></select>
+        <div id="historyContent" style="margin-top:15px;"></div>
         <button onclick="closeHistory()">Закрити</button>
     </div>
 </div>
@@ -221,7 +222,7 @@ function renderCars(){
     cars.forEach((car,i)=>{
         if(!car.history) car.history=[];
         carSelect.innerHTML+=`<option value="${i}">
-        ${car.number} ${car.model?'- '+car.model:''} ${car.vin?'- '+car.vin:''}
+        ${car.number} ${car.model?'- '+car.model:''}
         </option>`;
     });
 }
@@ -300,8 +301,6 @@ function generateReceipt(){
     if(selected.length===0) return;
 
     const date=new Date().toLocaleString();
-
-    // ЗБЕРІГАЄМО В ІСТОРІЮ
     car.history.push({date,services:selected,total});
     saveCars();
 
@@ -316,23 +315,35 @@ function generateReceipt(){
 function closeReceipt(){ receiptModal.style.display="none"; }
 
 function openHistory(){
-    const car=cars[carSelect.value];
-    if(!car) return;
-    historyContent.innerHTML="";
-    if(!car.history||car.history.length===0){
-        historyContent.innerHTML="Історія пуста";
-    }else{
-        car.history.forEach(h=>{
-            historyContent.innerHTML+=`
-            <div style="margin-bottom:15px;">
-            <strong>${h.date}</strong><br>
-            ${h.services.join("<br>")}
-            <br><strong>Разом: ${h.total} грн</strong>
-            </div>`;
-        });
-    }
+    const select=document.getElementById("historyCarSelect");
+    select.innerHTML="";
+    cars.forEach((car,i)=>{
+        select.innerHTML+=`<option value="${i}">
+        ${car.number} - ${car.model}
+        </option>`;
+    });
+    renderHistory();
     historyModal.style.display="flex";
 }
+
+function renderHistory(){
+    const index=document.getElementById("historyCarSelect").value;
+    const car=cars[index];
+    historyContent.innerHTML="";
+    if(!car||!car.history||car.history.length===0){
+        historyContent.innerHTML="Історія пуста";
+        return;
+    }
+    car.history.forEach(h=>{
+        historyContent.innerHTML+=`
+        <div style="margin-bottom:15px;">
+        <strong>${h.date}</strong><br>
+        ${h.services.join("<br>")}
+        <br><strong>Разом: ${h.total} грн</strong>
+        </div>`;
+    });
+}
+
 function closeHistory(){ historyModal.style.display="none"; }
 </script>
 
