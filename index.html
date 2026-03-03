@@ -16,7 +16,7 @@ body {
     min-height: 100vh;
 }
 
-/* 🔥 Анімація */
+/* 🔥 Анімація вправо */
 @keyframes bmwMoveRight {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
@@ -25,18 +25,18 @@ body {
 /* Кнопка історії */
 .history-btn {
     position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 9999;
+    top: 20px;
+    right: 20px;
     padding: 10px 18px;
-    border-radius: 30px;
+    border-radius: 25px;
     border: none;
-    color: white;
     font-weight: bold;
+    color: white;
     cursor: pointer;
     background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 4s linear infinite;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
 .card {
@@ -50,6 +50,7 @@ body {
 
 h2 {
     text-align: center;
+    margin-bottom: 20px;
     background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 6s linear infinite;
@@ -57,18 +58,36 @@ h2 {
     -webkit-text-fill-color: transparent;
 }
 
+/* 🔥 КНОПКИ акуратні */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin-top: 12px;
     border: none;
     border-radius: 10px;
-    color: white;
     font-weight: bold;
+    color: white;
     cursor: pointer;
+    transition: transform 0.3s;
     background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 4s linear infinite;
+}
+
+button:hover {
+    transform: scale(1.03);
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+.service {
+    margin: 8px 0;
 }
 
 .hidden { display: none; }
@@ -91,6 +110,7 @@ button {
     overflow-y: auto;
     color: white;
 }
+
 .history-entry {
     border-bottom: 1px solid #333;
     padding: 8px 0;
@@ -104,28 +124,32 @@ button {
 <button class="history-btn" onclick="openHistory()">Історія авто</button>
 
 <div class="card">
+
 <div id="page1">
 <h2>BMR ATELIER</h2>
 
 <label>Оберіть автомобіль:</label>
 <select id="carSelect"></select>
 
-<h3>Додати новий автомобіль</h3>
+<h3 style="margin-top:15px;color:#aaa;">Додати новий автомобіль</h3>
 <input type="text" id="newCarNumber" placeholder="Номер авто">
+<input type="text" id="newCarVin" placeholder="VIN код (не обов'язково)">
 <input type="text" id="newCarModel" placeholder="Модель авто">
+
 <button onclick="addCar()">Додати авто</button>
-<button onclick="goToPage2()">Далі</button>
+<button onclick="goToPage2()">Далі → Вибір послуг</button>
 </div>
 
 <div id="page2" class="hidden">
 <h2>BMR ATELIER</h2>
 <div id="services"></div>
 <button onclick="saveService()">Зберегти послуги</button>
-<button onclick="goToPage1()">← Назад</button>
-</div>
+<button onclick="goToPage1()">← Назад до авто</button>
 </div>
 
-<!-- Модальне вікно історії -->
+</div>
+
+<!-- Історія -->
 <div class="modal" id="historyModal">
 <div class="history-box">
 <h3>Історія обслуговування</h3>
@@ -138,27 +162,31 @@ button {
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 const carSelect = document.getElementById("carSelect");
 
-function saveData() {
+function saveData(){
     localStorage.setItem("cars", JSON.stringify(cars));
 }
 
-function renderCars() {
-    carSelect.innerHTML = "";
+function renderCars(){
+    carSelect.innerHTML="";
     cars.forEach((car,i)=>{
         if(!car.history) car.history=[];
-        carSelect.innerHTML += `<option value="${i}">${car.number} - ${car.model}</option>`;
+        carSelect.innerHTML+=`<option value="${i}">
+        ${car.number} - ${car.model} ${car.vin ? "- "+car.vin : ""}
+        </option>`;
     });
 }
 renderCars();
 
 function addCar(){
     const number=newCarNumber.value.trim();
+    const vin=newCarVin.value.trim();
     const model=newCarModel.value.trim();
     if(!number||!model) return alert("Введіть номер і модель!");
-    cars.push({number,model,history:[]});
+    cars.push({number,vin,model,history:[]});
     saveData();
     renderCars();
     newCarNumber.value="";
+    newCarVin.value="";
     newCarModel.value="";
 }
 
@@ -180,31 +208,34 @@ let services={
 };
 
 function renderServices(){
-    services.innerHTML="";
     const container=document.getElementById("services");
     container.innerHTML="";
     for(let s in services){
         container.innerHTML+=`
+        <div class="service">
         <label>
         <input type="checkbox" value="${s}"> ${s}
-        </label><br>`;
+        </label>
+        </div>`;
     }
 }
 renderServices();
 
 function saveService(){
     const car=cars[carSelect.value];
-    if(!car) return alert("Оберіть авто");
+    if(!car) return alert("Оберіть авто!");
     let selected=[];
     document.querySelectorAll("#services input:checked")
     .forEach(el=>selected.push(el.value));
     if(selected.length===0) return alert("Оберіть послуги!");
+
     car.history.push({
         date:new Date().toLocaleString(),
         services:selected
     });
+
     saveData();
-    alert("Додано в історію!");
+    alert("Запис додано в історію!");
 }
 
 function openHistory(){
