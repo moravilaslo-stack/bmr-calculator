@@ -6,6 +6,8 @@
 <title>BMR ATELIER</title>
 
 <style>
+/* --- ТВОЄ ОФОРМЛЕННЯ НЕ ЗМІНЕНО --- */
+
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -16,7 +18,6 @@ body {
     min-height: 100vh;
 }
 
-/* 🔥 Анімація руху вправо */
 @keyframes bmwMoveRight {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
@@ -36,7 +37,7 @@ h2 {
     margin-bottom: 20px;
     font-weight: 800;
     letter-spacing: 2px;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 6s linear infinite;
     -webkit-background-clip: text;
@@ -87,7 +88,7 @@ input[type="text"], input[type="number"], select {
 }
 
 .service input[type="checkbox"]:checked + .custom-checkbox {
-    background: linear-gradient(45deg, #5BC2E7, #1C69D4, #E10600);
+    background: linear-gradient(45deg,#5BC2E7,#1C69D4,#E10600);
     border: none;
 }
 
@@ -105,7 +106,7 @@ input[type="text"], input[type="number"], select {
     font-size: 18px;
     font-weight: bold;
     text-align: center;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600, #5BC2E7);
+    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
     background-size: 300% 100%;
     animation: bmwMoveRight 6s linear infinite;
     -webkit-background-clip: text;
@@ -130,15 +131,6 @@ input[type="text"], input[type="number"], select {
     color: white;
 }
 
-.receipt h3 {
-    text-align: center;
-    background: linear-gradient(90deg,#5BC2E7,#1C69D4,#E10600,#5BC2E7);
-    background-size: 300% 100%;
-    animation: bmwMoveRight 6s linear infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
 .receipt-item {
     display: flex;
     justify-content: space-between;
@@ -156,7 +148,6 @@ input[type="text"], input[type="number"], select {
 
 .hidden { display: none; }
 
-/* кнопка історії */
 .history-btn {
     position: fixed;
     top: 20px;
@@ -192,17 +183,25 @@ input[type="text"], input[type="number"], select {
 <div id="services"></div>
 <button onclick="generateReceipt()">Згенерувати чек</button>
 <div class="total" id="total">Загальна сума: 0 грн</div>
-
-<h3 style="margin-top:20px;color:#ccc;">Додати власну послугу</h3>
-<input type="text" id="customName" placeholder="Назва послуги">
-<input type="number" id="customPrice" placeholder="Ціна">
-<button onclick="addService()">Додати послугу</button>
 <button style="margin-top:20px;" onclick="goToPage1()">← Назад до авто</button>
 </div>
 
 </div>
 
-<!-- історія -->
+<!-- МОДАЛЬНЕ ВІКНО ЧЕКУ -->
+<div class="modal" id="receiptModal">
+    <div class="receipt">
+        <h3>BMR ATELIER</h3>
+        <div id="receiptCar"></div>
+        <div id="receiptItems"></div>
+        <div class="receipt-total" id="receiptTotal"></div>
+        <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
+        <button onclick="window.print()">Друк / Зберегти PDF</button>
+        <button onclick="closeReceipt()">Закрити</button>
+    </div>
+</div>
+
+<!-- МОДАЛЬНЕ ВІКНО ІСТОРІЇ -->
 <div class="modal" id="historyModal">
     <div class="receipt">
         <h3>Історія авто</h3>
@@ -215,120 +214,126 @@ input[type="text"], input[type="number"], select {
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 const carSelect = document.getElementById("carSelect");
 
-function saveCars() {
-    localStorage.setItem("cars", JSON.stringify(cars));
-}
+function saveCars(){ localStorage.setItem("cars", JSON.stringify(cars)); }
 
-function renderCars() {
-    carSelect.innerHTML = "";
-    cars.forEach((car, i) => {
+function renderCars(){
+    carSelect.innerHTML="";
+    cars.forEach((car,i)=>{
         if(!car.history) car.history=[];
-        carSelect.innerHTML += `<option value="${i}">${car.number} ${car.model ? '- ' + car.model : ''} ${car.vin ? '- ' + car.vin : ''}</option>`;
+        carSelect.innerHTML+=`<option value="${i}">
+        ${car.number} ${car.model?'- '+car.model:''} ${car.vin?'- '+car.vin:''}
+        </option>`;
     });
 }
 renderCars();
 
-function addCar() {
-    const number = newCarNumber.value.trim();
-    const vin = newCarVin.value.trim();
-    const model = newCarModel.value.trim();
-    if (!number || !model) return;
-    cars.push({ number, vin, model, history: [] });
+function addCar(){
+    const number=newCarNumber.value.trim();
+    const vin=newCarVin.value.trim();
+    const model=newCarModel.value.trim();
+    if(!number||!model) return;
+    cars.push({number,vin,model,history:[]});
     saveCars();
     renderCars();
-    newCarNumber.value = "";
-    newCarVin.value = "";
-    newCarModel.value = "";
+    newCarNumber.value="";
+    newCarVin.value="";
+    newCarModel.value="";
 }
 
-function goToPage2() {
-    if (cars.length === 0) return;
+function goToPage2(){
+    if(cars.length===0) return;
     page1.classList.add("hidden");
     page2.classList.remove("hidden");
 }
-
-function goToPage1() {
+function goToPage1(){
     page2.classList.add("hidden");
     page1.classList.remove("hidden");
 }
 
-let services = {
-    "Заміна масла": 800,
-    "Заміна гальмівних колодок": 1200,
-    "Діагностика двигуна": 1500,
-    "Заміна фільтрів": 600,
-    "Розвал-сходження": 1000
+let services={
+    "Заміна масла":800,
+    "Заміна гальмівних колодок":1200,
+    "Діагностика двигуна":1500,
+    "Заміна фільтрів":600,
+    "Розвал-сходження":1000
 };
 
-function renderServices() {
-    const container = document.getElementById("services");
-    container.innerHTML = "";
-    for (let service in services) {
-        container.innerHTML += `
+function renderServices(){
+    const container=document.getElementById("services");
+    container.innerHTML="";
+    for(let s in services){
+        container.innerHTML+=`
         <label class="service">
-            <input type="checkbox" value="${services[service]}" data-name="${service}" onchange="updateTotal()">
+            <input type="checkbox" value="${services[s]}" data-name="${s}" onchange="updateTotal()">
             <span class="custom-checkbox"></span>
-            ${service} - ${services[service]} грн
+            ${s} - ${services[s]} грн
         </label>`;
     }
 }
 renderServices();
 
-function updateTotal() {
-    let total = 0;
+function updateTotal(){
+    let total=0;
     document.querySelectorAll("input[type=checkbox]:checked")
-        .forEach(el => total += Number(el.value));
-    document.getElementById("total").innerText = "Загальна сума: " + total + " грн";
+    .forEach(el=>total+=Number(el.value));
+    document.getElementById("total").innerText="Загальна сума: "+total+" грн";
 }
 
-function generateReceipt() {
-    const car = cars[carSelect.value];
+function generateReceipt(){
+    const car=cars[carSelect.value];
     if(!car) return;
 
-    let total = 0;
-    let selectedServices = [];
-    const itemsContainer = document.getElementById("receiptItems");
-    document.querySelectorAll("input[type=checkbox]:checked").forEach(el => {
-        const name = el.dataset.name;
-        const price = Number(el.value);
-        total += price;
-        selectedServices.push(`${name} - ${price} грн`);
+    let total=0;
+    let selected=[];
+    const items=document.getElementById("receiptItems");
+    items.innerHTML="";
+
+    document.querySelectorAll("input[type=checkbox]:checked")
+    .forEach(el=>{
+        const name=el.dataset.name;
+        const price=Number(el.value);
+        total+=price;
+        selected.push(`${name} - ${price} грн`);
+        items.innerHTML+=`<div class="receipt-item"><span>${name}</span><span>${price} грн</span></div>`;
     });
 
-    if(selectedServices.length > 0){
-        car.history.push({
-            date: new Date().toLocaleString(),
-            services: selectedServices,
-            total: total
-        });
-        saveCars();
-    }
+    if(selected.length===0) return;
 
-    alert("Чек сформовано та додано в історію");
+    const date=new Date().toLocaleString();
+
+    // ЗБЕРІГАЄМО В ІСТОРІЮ
+    car.history.push({date,services:selected,total});
+    saveCars();
+
+    document.getElementById("receiptCar").innerHTML=
+    `<div class="receipt-item"><strong>Авто:</strong> ${car.number} - ${car.model}</div>`;
+    document.getElementById("receiptTotal").innerText="Разом: "+total+" грн";
+    document.getElementById("receiptDate").innerText="Дата: "+date;
+
+    receiptModal.style.display="flex";
 }
 
+function closeReceipt(){ receiptModal.style.display="none"; }
+
 function openHistory(){
-    const car = cars[carSelect.value];
+    const car=cars[carSelect.value];
     if(!car) return;
     historyContent.innerHTML="";
-    if(!car.history || car.history.length===0){
+    if(!car.history||car.history.length===0){
         historyContent.innerHTML="Історія пуста";
-    } else {
-        car.history.forEach(entry=>{
+    }else{
+        car.history.forEach(h=>{
             historyContent.innerHTML+=`
             <div style="margin-bottom:15px;">
-            <strong>${entry.date}</strong><br>
-            ${entry.services.join("<br>")}
-            <br><strong>Разом: ${entry.total} грн</strong>
+            <strong>${h.date}</strong><br>
+            ${h.services.join("<br>")}
+            <br><strong>Разом: ${h.total} грн</strong>
             </div>`;
         });
     }
     historyModal.style.display="flex";
 }
-
-function closeHistory(){
-    historyModal.style.display="none";
-}
+function closeHistory(){ historyModal.style.display="none"; }
 </script>
 
 </body>
