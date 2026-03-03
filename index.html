@@ -15,6 +15,28 @@ body {
     align-items: center;
     min-height: 100vh;
 }
+
+/* 🔥 Анімація BMW M */
+@keyframes bmwGradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.bmw-gradient-text {
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    background-size: 300% 300%;
+    animation: bmwGradientFlow 6s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bmw-gradient-bg {
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    background-size: 300% 300%;
+    animation: bmwGradientFlow 6s ease infinite;
+}
+
 .card {
     background: rgba(15, 15, 15, 0.95);
     padding: 30px;
@@ -23,28 +45,30 @@ body {
     box-shadow: 0 15px 40px rgba(0,0,0,0.7);
     color: white;
 }
+
 h2 {
     text-align: center;
     margin-bottom: 20px;
     font-weight: 800;
     letter-spacing: 2px;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
+
 button {
     width: 100%;
     padding: 12px;
     margin-top: 12px;
     border: none;
     border-radius: 10px;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
 }
-button:hover { transform: scale(1.05); }
+
+button:hover { 
+    transform: scale(1.05); 
+}
+
 input[type="text"], input[type="number"], select {
     width: 100%;
     padding: 8px;
@@ -52,12 +76,15 @@ input[type="text"], input[type="number"], select {
     border-radius: 8px;
     border: none;
 }
+
 .service {
     display: flex;
     align-items: center;
     margin: 10px 0;
 }
+
 .service input[type="checkbox"] { display: none; }
+
 .custom-checkbox {
     width: 22px;
     height: 22px;
@@ -67,10 +94,12 @@ input[type="text"], input[type="number"], select {
     position: relative;
     cursor: pointer;
 }
+
 .service input[type="checkbox"]:checked + .custom-checkbox {
     background: linear-gradient(45deg, #5BC2E7, #1C69D4, #E10600);
     border: none;
 }
+
 .service input[type="checkbox"]:checked + .custom-checkbox::after {
     content: "✔";
     position: absolute;
@@ -79,15 +108,14 @@ input[type="text"], input[type="number"], select {
     color: white;
     font-size: 16px;
 }
+
 .total {
     margin-top: 15px;
     font-size: 18px;
     font-weight: bold;
     text-align: center;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
+
 .modal {
     display: none;
     position: fixed;
@@ -96,6 +124,7 @@ input[type="text"], input[type="number"], select {
     justify-content: center;
     align-items: center;
 }
+
 .receipt {
     background: #111;
     padding: 25px;
@@ -104,18 +133,18 @@ input[type="text"], input[type="number"], select {
     box-shadow: 0 0 25px rgba(28,105,212,0.5);
     color: white;
 }
+
 .receipt h3 {
     text-align: center;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
+
 .receipt-item {
     display: flex;
     justify-content: space-between;
     margin: 6px 0;
     font-size: 14px;
 }
+
 .receipt-total {
     border-top: 1px solid #333;
     margin-top: 10px;
@@ -123,17 +152,20 @@ input[type="text"], input[type="number"], select {
     font-weight: bold;
     color: #5BC2E7;
 }
+
 .close-btn { background: #222; margin-top:8px; }
 .hidden { display: none; }
+
 </style>
 </head>
 
 <body>
 <div class="card">
 
-<!-- Сторінка 1: Вибір авто -->
+<!-- Сторінка 1 -->
 <div id="page1">
-<h2>BMR ATELIER</h2>
+<h2 class="bmw-gradient-text">BMR ATELIER</h2>
+
 <label>Оберіть автомобіль:</label>
 <select id="carSelect"></select>
 
@@ -141,40 +173,39 @@ input[type="text"], input[type="number"], select {
 <input type="text" id="newCarNumber" placeholder="Номер авто">
 <input type="text" id="newCarVin" placeholder="VIN (не обов'язково)">
 <input type="text" id="newCarModel" placeholder="Модель авто">
-<button onclick="addCar()">Додати автомобіль</button>
+<button class="bmw-gradient-bg" onclick="addCar()">Додати автомобіль</button>
 
-<button style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
+<button class="bmw-gradient-bg" style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
 </div>
 
-<!-- Сторінка 2: Послуги та чек -->
+<!-- Сторінка 2 -->
 <div id="page2" class="hidden">
-<h2>BMR ATELIER</h2>
+<h2 class="bmw-gradient-text">BMR ATELIER</h2>
 <div id="services"></div>
-<button onclick="generateReceipt()">Згенерувати чек</button>
-<div class="total" id="total">Загальна сума: 0 грн</div>
+<button class="bmw-gradient-bg" onclick="generateReceipt()">Згенерувати чек</button>
+<div class="total bmw-gradient-text" id="total">Загальна сума: 0 грн</div>
 
 <h3 style="margin-top:20px;color:#ccc;">Додати власну послугу</h3>
 <input type="text" id="customName" placeholder="Назва послуги">
 <input type="number" id="customPrice" placeholder="Ціна">
-<button onclick="addService()">Додати послугу</button>
+<button class="bmw-gradient-bg" onclick="addService()">Додати послугу</button>
 <button style="margin-top:20px;" onclick="goToPage1()">← Назад до авто</button>
 </div>
 
-<!-- Модальне вікно чеку -->
+<!-- Модальне вікно -->
 <div class="modal" id="modal">
     <div class="receipt">
-        <h3>BMR ATELIER</h3>
+        <h3 class="bmw-gradient-text">BMR ATELIER</h3>
         <div id="receiptCar"></div>
         <div id="receiptItems"></div>
         <div class="receipt-total" id="receiptTotal"></div>
         <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
-        <button onclick="window.print()">Завантажити / Друк</button>
+        <button class="bmw-gradient-bg" onclick="window.print()">Завантажити / Друк</button>
         <button class="close-btn" onclick="closeModal()">Закрити</button>
     </div>
 </div>
 
 <script>
-// Локальне зберігання авто
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 const carSelect = document.getElementById("carSelect");
 
@@ -199,7 +230,6 @@ function addCar() {
     document.getElementById("newCarModel").value = "";
 }
 
-// Сторінки
 function goToPage2() {
     if (cars.length === 0) { alert("Додайте автомобіль!"); return; }
     document.getElementById("page1").classList.add("hidden");
@@ -210,7 +240,6 @@ function goToPage1() {
     document.getElementById("page1").classList.remove("hidden");
 }
 
-// Послуги
 let services = {
     "Заміна масла": 800,
     "Заміна гальмівних колодок": 1200,
@@ -218,6 +247,7 @@ let services = {
     "Заміна фільтрів": 600,
     "Розвал-сходження": 1000
 };
+
 function renderServices() {
     const container = document.getElementById("services");
     container.innerHTML = "";
@@ -257,7 +287,9 @@ function generateReceipt() {
     document.getElementById("modal").style.display = "flex";
 }
 
-function closeModal() { document.getElementById("modal").style.display = "none"; }
+function closeModal() { 
+    document.getElementById("modal").style.display = "none"; 
+}
 
 function addService() {
     const name = document.getElementById("customName").value.trim();
