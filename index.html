@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMR ATELIER</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #111, #1a1a1a, #000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.card {
+    background: rgba(15, 15, 15, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    color: white;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.service {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+.service input[type="checkbox"] { display: none; }
+.custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #1C69D4;
+    border-radius: 6px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+}
+.service input[type="checkbox"]:checked + .custom-checkbox {
+    background: linear-gradient(45deg, #5BC2E7, #1C69D4, #E10600);
+    border: none;
+}
+.service input[type="checkbox"]:checked + .custom-checkbox::after {
+    content: "✔";
+    position: absolute;
+    top: -2px;
+    left: 4px;
+    color: white;
+    font-size: 16px;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { transform: scale(1.05); }
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+}
+.total {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+.receipt {
+    background: #111;
+    padding: 25px;
+    border-radius: 15px;
+    width: 340px;
+    box-shadow: 0 0 25px rgba(28,105,212,0.5);
+    color: white;
+}
+.receipt h3 {
+    text-align: center;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.receipt-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 14px;
+}
+.receipt-total {
+    border-top: 1px solid #333;
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: bold;
+    color: #5BC2E7;
+}
+.close-btn { background: #222; margin-top:8px; }
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>BMR ATELIER</h2>
+
+<!-- Вибір автомобіля -->
+<label>Оберіть автомобіль:</label>
+<select id="carSelect"></select>
+
+<h3 style="margin-top:15px;color:#aaa;">Додати новий автомобіль</h3>
+<input type="text" id="newCarNumber" placeholder="Номер авто">
+<input type="text" id="newCarVin" placeholder="VIN (не обов'язково)">
+<button onclick="addCar()">Додати автомобіль</button>
+
+<hr style="margin:15px 0; border-color:#333;">
+
+<div id="services"></div>
+<button onclick="generateReceipt()">Згенерувати чек</button>
+<div class="total" id="total">Загальна сума: 0 грн</div>
+
+<h3 style="margin-top:20px;color:#ccc;">Додати власну послугу</h3>
+<input type="text" id="customName" placeholder="Назва послуги">
+<input type="number" id="customPrice" placeholder="Ціна">
+<button onclick="addService()">Додати послугу</button>
+</div>
+
+<div class="modal" id="modal">
+    <div class="receipt">
+        <h3>BMR ATELIER</h3>
+        <div id="receiptCar"></div>
+        <div id="receiptItems"></div>
+        <div class="receipt-total" id="receiptTotal"></div>
+        <div id="receiptDate" style="margin-top:8px;font-size:12px;color:#aaa;"></div>
+        <button onclick="window.print()">Завантажити / Друк</button>
+        <button class="close-btn" onclick="closeModal()">Закрити</button>
+    </div>
+</div>
+
+<script>
+// Список автомобілів збережених у LocalStorage
+let cars = JSON.parse(localStorage.getItem("cars")) || [];
+const carSelect = document.getElementById("carSelect");
+
+function renderCars() {
+    carSelect.innerHTML = "";
+    cars.forEach((car, i) => {
+        carSelect.innerHTML += `<option value="${i}">${car.number} ${car.vin ? '- ' + car.vin : ''}</option>`;
+    });
+}
+renderCars();
+
+function addCar() {
+    const number = document.getElementById("newCarNumber").value.trim();
+    const vin = document.getElementById("newCarVin").value.trim();
+    if (!number) { alert("Введіть номер авто!"); return; }
+    cars.push({ number, vin });
+    localStorage.setItem("cars", JSON.stringify(cars));
+    renderCars();
+    document.getElementById("newCarNumber").value = "";
+    document.getElementById("newCarVin").value = "";
+}
+
+// Список послуг
+let services = {
+    "Заміна масла": 800,
+    "Заміна гальмівних колодок": 1200,
+    "Діагностика двигуна": 1500,
+    "Заміна фільтрів": 600,
+    "Розвал-сходження": 1000
+};
+
+function renderServices() {
+    const container = document.getElementById("services");
+    container.innerHTML = "";
+    for (let service in services) {
+        container.innerHTML += `
+        <label class="service">
+            <input type="checkbox" value="${services[service]}" onchange="updateTotal()">
+            <span class="custom-checkbox"></span>
+            ${service} - ${services[service]} грн
+        </label>`;
+    }
+}
+
+function updateTotal() {
+    let total = 0;
+    document.querySelectorAll("input[type=checkbox]:checked")
+        .forEach(el => total += Number(el.value));
+    document.getElementById("total").innerText = "Загальна сума: " + total + " грн";
+}
+
+function generateReceipt() {
+    if (cars.length === 0) { alert("Додайте автомобіль!"); return; }
+
+    const car = cars[carSelect.value];
+    let total = 0;
+    const itemsContainer = document.getElementById("receiptItems");
+    itemsContainer.innerHTML = "";
+
+    document.querySelectorAll("input[type=checkbox]:checked")
+        .forEach(el => {
+            const label = el.parentElement.innerText;
+            const price = Number(el.value);
+            total += price;
+            itemsContainer.innerHTML += `<div class="receipt-item"><span>${label}</span></div>`;
+        });
+
+    document.getElementById("receiptCar").innerHTML =
+        `<div class="receipt-item"><strong>Авто:</strong> ${car.number} ${car.vin ? '- ' + car.vin : ''}</div>`;
+    document.getElementById("receiptTotal").innerText = "Разом: " + total + " грн";
+    document.getElementById("receiptDate").innerText = "Дата: " + new Date().toLocaleString();
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() { document.getElementById("modal").style.display = "none"; }
+
+function addService() {
+    const name = document.getElementById("customName").value.trim();
+    const price = Number(document.getElementById("customPrice").value);
+    if (!name || !price) { alert("Введіть правильні дані!"); return; }
+    services[name] = price;
+    renderServices();
+    updateTotal();
+    document.getElementById("customName").value = "";
+    document.getElementById("customPrice").value = "";
+}
+
+renderServices();
+</script>
+</body>
+</html>
