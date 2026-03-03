@@ -32,6 +32,26 @@ h2 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { transform: scale(1.05); }
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+}
 .service {
     display: flex;
     align-items: center;
@@ -58,26 +78,6 @@ h2 {
     left: 4px;
     color: white;
     font-size: 16px;
-}
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(90deg, #5BC2E7, #1C69D4, #E10600);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-button:hover { transform: scale(1.05); }
-input[type="text"], input[type="number"], select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 8px;
-    border-radius: 8px;
-    border: none;
 }
 .total {
     margin-top: 15px;
@@ -124,24 +124,31 @@ input[type="text"], input[type="number"], select {
     color: #5BC2E7;
 }
 .close-btn { background: #222; margin-top:8px; }
+.hidden { display: none; }
 </style>
 </head>
 
 <body>
 <div class="card">
-<h2>BMR ATELIER</h2>
 
-<!-- Вибір автомобіля -->
+<!-- Сторінка 1: Вибір авто -->
+<div id="page1">
+<h2>BMR ATELIER</h2>
 <label>Оберіть автомобіль:</label>
 <select id="carSelect"></select>
 
 <h3 style="margin-top:15px;color:#aaa;">Додати новий автомобіль</h3>
 <input type="text" id="newCarNumber" placeholder="Номер авто">
 <input type="text" id="newCarVin" placeholder="VIN (не обов'язково)">
+<input type="text" id="newCarModel" placeholder="Модель авто">
 <button onclick="addCar()">Додати автомобіль</button>
 
-<hr style="margin:15px 0; border-color:#333;">
+<button style="margin-top:20px;" onclick="goToPage2()">Далі → Вибір послуг</button>
+</div>
 
+<!-- Сторінка 2: Послуги та чек -->
+<div id="page2" class="hidden">
+<h2>BMR ATELIER</h2>
 <div id="services"></div>
 <button onclick="generateReceipt()">Згенерувати чек</button>
 <div class="total" id="total">Загальна сума: 0 грн</div>
@@ -150,8 +157,10 @@ input[type="text"], input[type="number"], select {
 <input type="text" id="customName" placeholder="Назва послуги">
 <input type="number" id="customPrice" placeholder="Ціна">
 <button onclick="addService()">Додати послугу</button>
+<button style="margin-top:20px;" onclick="goToPage1()">← Назад до авто</button>
 </div>
 
+<!-- Модальне вікно чеку -->
 <div class="modal" id="modal">
     <div class="receipt">
         <h3>BMR ATELIER</h3>
@@ -165,14 +174,14 @@ input[type="text"], input[type="number"], select {
 </div>
 
 <script>
-// Список автомобілів збережених у LocalStorage
+// Локальне зберігання авто
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 const carSelect = document.getElementById("carSelect");
 
 function renderCars() {
     carSelect.innerHTML = "";
     cars.forEach((car, i) => {
-        carSelect.innerHTML += `<option value="${i}">${car.number} ${car.vin ? '- ' + car.vin : ''}</option>`;
+        carSelect.innerHTML += `<option value="${i}">${car.number} ${car.model ? '- ' + car.model : ''} ${car.vin ? '- ' + car.vin : ''}</option>`;
     });
 }
 renderCars();
@@ -180,15 +189,28 @@ renderCars();
 function addCar() {
     const number = document.getElementById("newCarNumber").value.trim();
     const vin = document.getElementById("newCarVin").value.trim();
-    if (!number) { alert("Введіть номер авто!"); return; }
-    cars.push({ number, vin });
+    const model = document.getElementById("newCarModel").value.trim();
+    if (!number || !model) { alert("Введіть номер і модель авто!"); return; }
+    cars.push({ number, vin, model });
     localStorage.setItem("cars", JSON.stringify(cars));
     renderCars();
     document.getElementById("newCarNumber").value = "";
     document.getElementById("newCarVin").value = "";
+    document.getElementById("newCarModel").value = "";
 }
 
-// Список послуг
+// Сторінки
+function goToPage2() {
+    if (cars.length === 0) { alert("Додайте автомобіль!"); return; }
+    document.getElementById("page1").classList.add("hidden");
+    document.getElementById("page2").classList.remove("hidden");
+}
+function goToPage1() {
+    document.getElementById("page2").classList.add("hidden");
+    document.getElementById("page1").classList.remove("hidden");
+}
+
+// Послуги
 let services = {
     "Заміна масла": 800,
     "Заміна гальмівних колодок": 1200,
@@ -196,7 +218,6 @@ let services = {
     "Заміна фільтрів": 600,
     "Розвал-сходження": 1000
 };
-
 function renderServices() {
     const container = document.getElementById("services");
     container.innerHTML = "";
@@ -209,6 +230,7 @@ function renderServices() {
         </label>`;
     }
 }
+renderServices();
 
 function updateTotal() {
     let total = 0;
@@ -218,23 +240,18 @@ function updateTotal() {
 }
 
 function generateReceipt() {
-    if (cars.length === 0) { alert("Додайте автомобіль!"); return; }
-
     const car = cars[carSelect.value];
     let total = 0;
     const itemsContainer = document.getElementById("receiptItems");
     itemsContainer.innerHTML = "";
-
-    document.querySelectorAll("input[type=checkbox]:checked")
-        .forEach(el => {
-            const label = el.parentElement.innerText;
-            const price = Number(el.value);
-            total += price;
-            itemsContainer.innerHTML += `<div class="receipt-item"><span>${label}</span></div>`;
-        });
-
+    document.querySelectorAll("input[type=checkbox]:checked").forEach(el => {
+        const label = el.parentElement.innerText;
+        const price = Number(el.value);
+        total += price;
+        itemsContainer.innerHTML += `<div class="receipt-item"><span>${label}</span></div>`;
+    });
     document.getElementById("receiptCar").innerHTML =
-        `<div class="receipt-item"><strong>Авто:</strong> ${car.number} ${car.vin ? '- ' + car.vin : ''}</div>`;
+        `<div class="receipt-item"><strong>Авто:</strong> ${car.number} - ${car.model} ${car.vin ? '- VIN: ' + car.vin : ''}</div>`;
     document.getElementById("receiptTotal").innerText = "Разом: " + total + " грн";
     document.getElementById("receiptDate").innerText = "Дата: " + new Date().toLocaleString();
     document.getElementById("modal").style.display = "flex";
@@ -252,8 +269,6 @@ function addService() {
     document.getElementById("customName").value = "";
     document.getElementById("customPrice").value = "";
 }
-
-renderServices();
 </script>
 </body>
 </html>
